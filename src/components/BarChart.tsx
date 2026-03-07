@@ -70,7 +70,7 @@ export const BarChart: FC<BarChartProps> = ({ title, data, unit, delay = 0, useP
         <h3 className="text-[20px] font-bold text-[#171717] dark:text-white text-center">{title}</h3>
       </div>
 
-      <motion.div className="flex flex-col gap-4 flex-grow">
+      <motion.div className="flex flex-col gap-4 flex-grow" role="list" aria-label={`${title} benchmark results`}>
         {data.map((item, i) => {
           const widthPercent = Math.max((item.value / maxValue) * 100, 1);
 
@@ -79,6 +79,8 @@ export const BarChart: FC<BarChartProps> = ({ title, data, unit, delay = 0, useP
               key={i}
               variants={itemVariants}
               className="flex flex-col"
+              role="listitem"
+              aria-label={`${item.label}: ${item.value.toFixed(2)} ${unit}`}
             >
               <div className="flex justify-between items-end mb-2">
                 <div className={`text-[15px] ${item.isHighlight ? 'font-bold text-[#171717] dark:text-white' : 'font-medium text-gray-600 dark:text-gray-300'}`}>

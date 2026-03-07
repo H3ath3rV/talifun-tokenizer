@@ -14,35 +14,62 @@ const socialLinkClass = "flex items-center gap-2 px-3 py-2 rounded-full text-[13
 const mobileSocialLinkClass = "flex items-center gap-2.5 px-3 py-2.5 rounded-full text-[14px] font-medium text-gray-700 dark:text-gray-300 hover:text-[#FF5100] dark:hover:text-[#FF5100] hover:bg-black/5 dark:hover:bg-white/5";
 
 export default function App() {
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    const stored = localStorage.getItem('theme');
+    return stored ? stored === 'dark' : true;
+  });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLElement>(null);
+  const menuToggleRef = useRef<HTMLButtonElement>(null);
+  const firstMenuLinkRef = useRef<HTMLAnchorElement>(null);
+  const lastMenuLinkRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
     if (isDark) {
       document.documentElement.classList.add('dark');
-      document.body.style.backgroundColor = '#0a0a0a';
     } else {
       document.documentElement.classList.remove('dark');
-      document.body.style.backgroundColor = '#FDFDFD';
     }
   }, [isDark]);
 
-  // Escape-to-close and click-outside for mobile menu
+  // Focus trap, escape-to-close, and click-outside for mobile menu
   useEffect(() => {
     if (!isMobileMenuOpen) return;
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsMobileMenuOpen(false);
+
+    // Move focus into menu on open
+    requestAnimationFrame(() => firstMenuLinkRef.current?.focus());
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+        menuToggleRef.current?.focus();
+        return;
+      }
+      // Trap focus within mobile menu
+      if (e.key === 'Tab') {
+        if (e.shiftKey && document.activeElement === firstMenuLinkRef.current) {
+          e.preventDefault();
+          lastMenuLinkRef.current?.focus();
+        } else if (!e.shiftKey && document.activeElement === lastMenuLinkRef.current) {
+          e.preventDefault();
+          firstMenuLinkRef.current?.focus();
+        }
+      }
     };
     const handleClickOutside = (e: MouseEvent) => {
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
+      if (
+        mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node) &&
+        menuToggleRef.current && !menuToggleRef.current.contains(e.target as Node)
+      ) {
         setIsMobileMenuOpen(false);
       }
     };
-    document.addEventListener('keydown', handleEscape);
+    document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isMobileMenuOpen]);
@@ -77,23 +104,23 @@ export default function App() {
           <div className="flex items-center gap-3">
             {/* Desktop Navigation */}
             <nav className="hidden xl:flex items-center gap-0.5 bg-white dark:bg-[#121212]/60 backdrop-blur-xl border border-gray-200/80 dark:border-white/10 rounded-full px-1 py-1 shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.12)] mr-2" aria-label="Social links">
-              <a href="https://arxiv.org" target="_blank" rel="noopener noreferrer" className={socialLinkClass}>
+              <a href="https://arxiv.org" target="_blank" rel="noopener noreferrer" aria-label="ArXiv (opens in new tab)" className={socialLinkClass}>
                 <FileText size={18} />
                 ArXiv
               </a>
-              <a href="https://news.ycombinator.com" target="_blank" rel="noopener noreferrer" className={socialLinkClass}>
+              <a href="https://news.ycombinator.com" target="_blank" rel="noopener noreferrer" aria-label="Hacker News (opens in new tab)" className={socialLinkClass}>
                 <HackerNewsIcon size={18} />
                 Hacker News
               </a>
-              <a href="https://huggingface.co" target="_blank" rel="noopener noreferrer" className={socialLinkClass}>
+              <a href="https://huggingface.co" target="_blank" rel="noopener noreferrer" aria-label="Hugging Face (opens in new tab)" className={socialLinkClass}>
                 <HuggingFaceIcon size={18} />
                 Hugging Face
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className={socialLinkClass}>
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn (opens in new tab)" className={socialLinkClass}>
                 <LinkedInIcon size={18} />
                 LinkedIn
               </a>
-              <a href="https://reddit.com" target="_blank" rel="noopener noreferrer" className={socialLinkClass}>
+              <a href="https://reddit.com" target="_blank" rel="noopener noreferrer" aria-label="Reddit (opens in new tab)" className={socialLinkClass}>
                 <RedditIcon size={18} />
                 Reddit
               </a>
@@ -107,6 +134,7 @@ export default function App() {
               {isDark ? <Sun size={20} /> : <Moon size={20} />}
             </button>
             <button
+              ref={menuToggleRef}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="xl:hidden p-2 sm:p-3 rounded-full bg-white/60 dark:bg-[#121212]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:text-[#FF5100] dark:hover:text-[#FF5100] shadow-[0_2px_16px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_16px_rgba(0,0,0,0.12)]"
               aria-label="Toggle mobile menu"
@@ -119,24 +147,24 @@ export default function App() {
 
           {/* Mobile Navigation Menu */}
           {isMobileMenuOpen && (
-            <nav ref={mobileMenuRef} id="mobile-nav" className="absolute top-full left-0 right-0 mt-2 p-1.5 bg-white/90 dark:bg-[#121212]/90 backdrop-blur-2xl border border-white/40 dark:border-white/10 rounded-2xl shadow-xl flex flex-col gap-0.5 xl:hidden max-h-[calc(100dvh-80px)] overflow-y-auto" aria-label="Mobile navigation">
-              <a href="https://arxiv.org" target="_blank" rel="noopener noreferrer" className={mobileSocialLinkClass}>
+            <nav ref={mobileMenuRef} id="mobile-nav" role="menu" className="absolute top-full left-0 right-0 mt-2 p-1.5 bg-white/90 dark:bg-[#121212]/90 backdrop-blur-2xl border border-white/40 dark:border-white/10 rounded-2xl shadow-xl flex flex-col gap-0.5 xl:hidden max-h-[calc(100dvh-80px)] overflow-y-auto" aria-label="Mobile navigation">
+              <a ref={firstMenuLinkRef} href="https://arxiv.org" target="_blank" rel="noopener noreferrer" role="menuitem" aria-label="ArXiv (opens in new tab)" className={mobileSocialLinkClass}>
                 <FileText size={20} />
                 ArXiv
               </a>
-              <a href="https://news.ycombinator.com" target="_blank" rel="noopener noreferrer" className={mobileSocialLinkClass}>
+              <a href="https://news.ycombinator.com" target="_blank" rel="noopener noreferrer" role="menuitem" aria-label="Hacker News (opens in new tab)" className={mobileSocialLinkClass}>
                 <HackerNewsIcon size={20} />
                 Hacker News
               </a>
-              <a href="https://huggingface.co" target="_blank" rel="noopener noreferrer" className={mobileSocialLinkClass}>
+              <a href="https://huggingface.co" target="_blank" rel="noopener noreferrer" role="menuitem" aria-label="Hugging Face (opens in new tab)" className={mobileSocialLinkClass}>
                 <HuggingFaceIcon size={20} />
                 Hugging Face
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className={mobileSocialLinkClass}>
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" role="menuitem" aria-label="LinkedIn (opens in new tab)" className={mobileSocialLinkClass}>
                 <LinkedInIcon size={20} />
                 LinkedIn
               </a>
-              <a href="https://reddit.com" target="_blank" rel="noopener noreferrer" className={mobileSocialLinkClass}>
+              <a ref={lastMenuLinkRef} href="https://reddit.com" target="_blank" rel="noopener noreferrer" role="menuitem" aria-label="Reddit (opens in new tab)" className={mobileSocialLinkClass}>
                 <RedditIcon size={20} />
                 Reddit
               </a>
@@ -210,6 +238,7 @@ export default function App() {
                   href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="Watch the launch walkthrough video (opens in new tab)"
                   className="relative w-full aspect-video rounded-[24px] overflow-hidden shadow-lg group block border border-white/20 dark:border-white/10"
                 >
                   <img
@@ -235,6 +264,7 @@ export default function App() {
                     href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-label="Watch the launch video (opens in new tab)"
                     className="group inline-flex justify-between items-center gap-4 px-6 py-4 sm:px-8 sm:py-5 rounded-full bg-[#171717] dark:bg-[#121212]/60 backdrop-blur-xl border border-[#171717] dark:border-white/10 text-[15px] sm:text-[16px] font-medium tracking-[0.015em] text-white hover:text-[#FF5100] dark:hover:text-[#FF5100] hover:bg-black dark:hover:bg-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.12)] w-full"
                   >
                     Watch the launch video
