@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://h3ath3rv.github.io/talifun-tokenizer/sitemap.xml

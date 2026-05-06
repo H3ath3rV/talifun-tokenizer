@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Talifun Tokenizer - Lowest Latency / Highest Throughput</title>
+
+  <!-- SEO Meta -->
+  <meta name="description"
+    content="The fastest BPE tokenizer — 928 MB/s Node, 833 MB/s Python, 943 MB/s Rust. Lowest latency, highest throughput. See the o200k benchmark results." />
+  <link rel="canonical" href="https://h3ath3rv.github.io/talifun-tokenizer/" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Talifun Tokenizer - Lowest Latency / Highest Throughput" />
+  <meta property="og:description"
+    content="Lowest latency. Highest throughput. 928 MB/s Node, 833 MB/s Python, 943 MB/s Rust." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://h3ath3rv.github.io/talifun-tokenizer/" />
+  <meta property="og:image" content="https://h3ath3rv.github.io/talifun-tokenizer/og-image.png?v=3" />
+  <meta property="og:image:width" content="2400" />
+  <meta property="og:image:height" content="1260" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Talifun Tokenizer - Lowest Latency / Highest Throughput" />
+  <meta name="twitter:description" content="Lowest latency. Highest throughput. See the o200k benchmark results." />
+  <meta name="twitter:image" content="https://h3ath3rv.github.io/talifun-tokenizer/og-image.png?v=3" />
+
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#0a0a0a" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Talifun Tokenizer",
+      "applicationCategory": "DeveloperApplication",
+      "description": "The fastest BPE tokenizer — 928 MB/s Node, 833 MB/s Python, 943 MB/s Rust.",
+      "url": "https://h3ath3rv.github.io/talifun-tokenizer/",
+      "operatingSystem": "Cross-platform",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <script>
+    // Apply dark mode immediately to prevent white flash
+    (function() {
+      var theme = localStorage.getItem('theme');
+      if (theme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>
